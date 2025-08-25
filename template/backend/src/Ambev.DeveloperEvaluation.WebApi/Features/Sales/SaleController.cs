@@ -1,5 +1,6 @@
 ﻿using Ambev.DeveloperEvaluation.Application.Sales.CancelSale;
 using Ambev.DeveloperEvaluation.Application.Sales.FinalizeSale;
+using Ambev.DeveloperEvaluation.Application.Sales.GetSaleById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,17 +24,18 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
             return CreatedAtAction(nameof(GetById), new { id = saleId }, null);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(Guid id)
-        {
-            return Ok();
-        }
-
         [HttpPost("{id}/cancel")]
         public async Task<IActionResult> Cancel(Guid id)
         {
             var result = await _mediator.Send(new CancelSaleCommand(id));
             return result ? Ok() : NotFound();
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            var result = await _mediator.Send(new GetSaleByIdQuery(id));
+            return result is null ? NotFound() : Ok(result);
         }
     }
 }
