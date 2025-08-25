@@ -1,4 +1,5 @@
 ﻿using Ambev.DeveloperEvaluation.Application.Sales.CancelSale;
+using Ambev.DeveloperEvaluation.Application.Sales.DeleteSale;
 using Ambev.DeveloperEvaluation.Application.Sales.FinalizeSale;
 using Ambev.DeveloperEvaluation.Application.Sales.GetSaleById;
 using Ambev.DeveloperEvaluation.Application.Sales.GetSales;
@@ -24,6 +25,14 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
         {
             var saleId = await _mediator.Send(command);
             return CreatedAtAction(nameof(GetById), new { id = saleId }, null);
+        }
+
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> Delete([FromRoute] Guid id)
+        {
+            var result = await _mediator.Send(new DeleteSaleCommand(id));
+            if (!result) return NotFound();
+            return NoContent();
         }
 
         [HttpPut("{id:guid}")]

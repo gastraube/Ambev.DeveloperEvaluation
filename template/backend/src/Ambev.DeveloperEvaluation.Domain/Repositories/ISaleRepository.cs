@@ -23,6 +23,8 @@ namespace Ambev.DeveloperEvaluation.Domain.Repositories
             int page,
             int size,
             CancellationToken cancellationToken = default);
+
+        Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
     }
 }
 

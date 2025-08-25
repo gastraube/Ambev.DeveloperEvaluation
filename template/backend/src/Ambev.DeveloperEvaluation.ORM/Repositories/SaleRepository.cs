@@ -121,5 +121,17 @@ namespace Ambev.DeveloperEvaluation.ORM.Repositories
 
             return ordered ?? query.OrderByDescending(s => s.SaleDate).ThenBy(s => s.SaleNumber);
         }
+
+        public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+        {
+            var sale = await _context.Sales.Include(s => s.Items)
+                                           .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
+            if (sale is null)
+                return false;
+
+            _context.Sales.Remove(sale);
+            await _context.SaveChangesAsync(cancellationToken);
+            return true;
+        }
     }
 }
