@@ -2,6 +2,7 @@
 using Ambev.DeveloperEvaluation.Application.Sales.FinalizeSale;
 using Ambev.DeveloperEvaluation.Application.Sales.GetSaleById;
 using Ambev.DeveloperEvaluation.Application.Sales.GetSales;
+using Ambev.DeveloperEvaluation.Application.Sales.UpdateSale;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,6 +24,15 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
         {
             var saleId = await _mediator.Send(command);
             return CreatedAtAction(nameof(GetById), new { id = saleId }, null);
+        }
+
+        [HttpPut("{id:guid}")]
+        public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateSaleCommand command)
+        {
+            command.Id = id;
+
+            var updatedId = await _mediator.Send(command);
+            return Ok(new { id = updatedId });
         }
 
         [HttpGet]
