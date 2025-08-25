@@ -30,5 +30,10 @@ namespace Ambev.DeveloperEvaluation.ORM.Repositories
                 .Include(s => s.Items)
                 .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
         }
+
+        public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            await _context.SaveChangesAsync(cancellationToken);
+        }
     }
 }
