@@ -24,10 +24,10 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CancelSale
                 return false;
 
             if (sale.Status == Domain.Enums.SaleStatus.Cancelled)
-                return false; // já está cancelada
+                return false;
 
-            sale.Cancel(); // altera status e atualiza UpdatedAt
-            await _repository.SaveChangesAsync(cancellationToken); // você precisa adicionar esse método
+            sale.Cancel();
+            await _repository.SaveChangesAsync(cancellationToken);
 
             return true;
         }

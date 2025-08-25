@@ -1,5 +1,6 @@
 ﻿using Ambev.DeveloperEvaluation.Domain.Common;
 using Ambev.DeveloperEvaluation.Domain.Enums;
+using Ambev.DeveloperEvaluation.Domain.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,6 +49,18 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
 
             Items.ForEach(i => i.ApplyDiscount());
             CalculateTotal();
+
+            AddDomainEvent(new SaleCreatedEvent(Id, SaleNumber, TotalAmount));
+        }
+
+        public void UpdateItems(IEnumerable<SaleItem> newItems)
+        {
+            Items = newItems.ToList();
+            Items.ForEach(i => i.ApplyDiscount());
+            CalculateTotal();
+            UpdatedAt = DateTime.UtcNow;
+
+            AddDomainEvent(new SaleModifiedEvent(Id, SaleNumber, TotalAmount));
         }
     }
 
