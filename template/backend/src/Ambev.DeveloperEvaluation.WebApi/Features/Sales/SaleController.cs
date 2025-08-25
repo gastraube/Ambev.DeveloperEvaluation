@@ -1,6 +1,7 @@
 ﻿using Ambev.DeveloperEvaluation.Application.Sales.CancelSale;
 using Ambev.DeveloperEvaluation.Application.Sales.FinalizeSale;
 using Ambev.DeveloperEvaluation.Application.Sales.GetSaleById;
+using Ambev.DeveloperEvaluation.Application.Sales.GetSales;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,6 +23,33 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
         {
             var saleId = await _mediator.Send(command);
             return CreatedAtAction(nameof(GetById), new { id = saleId }, null);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Get(
+        [FromQuery(Name = "_page")] int page = 1,
+        [FromQuery(Name = "_size")] int size = 10,
+        [FromQuery(Name = "_order")] string? order = null,
+        [FromQuery] string? saleNumber = null,
+        [FromQuery] string? clientName = null,
+        [FromQuery] string? branch = null,
+        [FromQuery(Name = "_minDate")] DateTime? minDate = null,
+        [FromQuery(Name = "_maxDate")] DateTime? maxDate = null)
+        {
+            var query = new GetSalesQuery
+            {
+                Page = page,
+                Size = size,
+                Order = order,
+                SaleNumber = saleNumber,
+                ClientName = clientName,
+                Branch = branch,
+                MinDate = minDate,
+                MaxDate = maxDate
+            };
+
+            var result = await _mediator.Send(query);
+            return Ok(result);
         }
 
         [HttpPost("{id}/cancel")]
