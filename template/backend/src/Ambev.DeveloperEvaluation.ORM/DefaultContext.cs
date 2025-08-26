@@ -3,7 +3,9 @@ using Ambev.DeveloperEvaluation.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
 namespace Ambev.DeveloperEvaluation.ORM;
@@ -15,6 +17,8 @@ public class DefaultContext : DbContext
     public DbSet<SaleItem> SaleItems { get; set; }
 
     private IMediator _mediator { get; set; }
+
+    [ActivatorUtilitiesConstructor]
     public DefaultContext(DbContextOptions<DefaultContext> options, IMediator mediator) : base(options)
     {
         _mediator = mediator;
@@ -33,8 +37,7 @@ public class DefaultContext : DbContext
     {
         var result = await base.SaveChangesAsync(cancellationToken);
 
-        if (_mediator is null) return result;
-
+        // Publica eventos de domínio pós-commit
         var entitiesWithEvents = ChangeTracker
             .Entries<BaseEntity>()
             .Where(e => e.Entity.DomainEvents != null && e.Entity.DomainEvents.Any())
@@ -47,13 +50,12 @@ public class DefaultContext : DbContext
             entity.ClearDomainEvents();
 
             foreach (var domainEvent in events)
-            {
                 await _mediator.Publish(domainEvent, cancellationToken);
-            }
         }
 
         return result;
     }
+
 
 }
 public class YourDbContextFactory : IDesignTimeDbContextFactory<DefaultContext>

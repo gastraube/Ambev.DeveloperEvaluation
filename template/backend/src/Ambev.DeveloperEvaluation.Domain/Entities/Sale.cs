@@ -35,6 +35,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         {
             Status = SaleStatus.Cancelled;
             UpdatedAt = DateTime.UtcNow;
+            AddDomainEvent(new SaleCancelledEvent(Id, SaleNumber));
         }
 
         public bool IsValid()
@@ -49,8 +50,6 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
 
             Items.ForEach(i => i.ApplyDiscount());
             CalculateTotal();
-
-            AddDomainEvent(new SaleCreatedEvent(Id, SaleNumber, TotalAmount));
         }
 
         public void UpdateItems(IEnumerable<SaleItem> newItems)

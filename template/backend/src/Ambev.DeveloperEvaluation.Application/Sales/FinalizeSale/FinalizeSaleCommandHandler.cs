@@ -1,4 +1,5 @@
 ﻿using Ambev.DeveloperEvaluation.Domain.Entities;
+using Ambev.DeveloperEvaluation.Domain.Events;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using MediatR;
 using System;
@@ -36,7 +37,8 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.FinalizeSale
 
             sale.FinalizeSale();
 
-            await _repository.AddAsync(sale);
+            sale.AddDomainEvent(new SaleCreatedEvent(sale.Id, sale.SaleNumber, sale.TotalAmount));
+            await _repository.AddAsync(sale, cancellationToken);
             return sale.Id;
         }
     }

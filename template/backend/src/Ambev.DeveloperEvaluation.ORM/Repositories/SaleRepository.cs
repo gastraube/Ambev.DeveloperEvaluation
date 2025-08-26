@@ -1,4 +1,5 @@
 ﻿using Ambev.DeveloperEvaluation.Domain.Entities;
+using Ambev.DeveloperEvaluation.Domain.Events;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -131,6 +132,8 @@ namespace Ambev.DeveloperEvaluation.ORM.Repositories
 
             _context.Sales.Remove(sale);
             await _context.SaveChangesAsync(cancellationToken);
+
+            sale.AddDomainEvent(new SaleDeletedEvent(sale.Id, sale.SaleNumber));
             return true;
         }
     }

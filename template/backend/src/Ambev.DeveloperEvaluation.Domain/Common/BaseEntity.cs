@@ -24,7 +24,7 @@ public class BaseEntity : IComparable<BaseEntity>
         return other!.Id.CompareTo(Id);
     }
 
-    protected void AddDomainEvent(INotification eventItem)
+    public void AddDomainEvent(INotification eventItem)
     {
         _domainEvents ??= new List<INotification>();
         _domainEvents.Add(eventItem);

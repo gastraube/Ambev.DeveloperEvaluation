@@ -3,10 +3,11 @@ using Ambev.DeveloperEvaluation.Common.HealthChecks;
 using Ambev.DeveloperEvaluation.Common.Logging;
 using Ambev.DeveloperEvaluation.Common.Security;
 using Ambev.DeveloperEvaluation.Common.Validation;
+using Ambev.DeveloperEvaluation.Domain.Events;
+using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Ambev.DeveloperEvaluation.IoC;
 using Ambev.DeveloperEvaluation.ORM;
 using Ambev.DeveloperEvaluation.ORM.Repositories;
-using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Ambev.DeveloperEvaluation.WebApi.Middleware;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -47,7 +48,8 @@ public class Program
             {
                 cfg.RegisterServicesFromAssemblies(
                     typeof(Program).Assembly,
-                    typeof(ApplicationLayer).Assembly
+                    typeof(ApplicationLayer).Assembly,
+                    typeof(SaleCreatedEventHandler).Assembly
                 );
             });
 

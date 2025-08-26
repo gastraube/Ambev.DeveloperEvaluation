@@ -19,7 +19,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Events
 
         public Task Handle(SaleCancelledEvent notification, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Event: SaleCancelled | SaleId: {SaleId} | Number: {Number}",
+            _logger.LogInformation("Event SaleCancelled | SaleId: {SaleId} | Number: {Number}",
                 notification.SaleId, notification.SaleNumber);
             return Task.CompletedTask;
         }
