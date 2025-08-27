@@ -6,58 +6,38 @@ using System.Text;
 
 namespace Ambev.DeveloperEvaluation.Common.Security;
 
-/// <summary>
-/// Implementation of JWT (JSON Web Token) generator.
-/// </summary>
-public class JwtTokenGenerator : IJwtTokenGenerator
+public sealed class JwtTokenGenerator : IJwtTokenGenerator
 {
-    private readonly IConfiguration _configuration;
+    private readonly IConfiguration _config;
+    public JwtTokenGenerator(IConfiguration config) => _config = config;
 
-    /// <summary>
-    /// Initializes a new instance of the JWT token generator.
-    /// </summary>
-    /// <param name="configuration">Application configuration containing the necessary keys for token generation.</param>
-    public JwtTokenGenerator(IConfiguration configuration)
+    public string GenerateToken(Guid userId, string username, IEnumerable<string>? roles = null)
     {
-        _configuration = configuration;
-    }
+        var issuer = _config["Jwt:Issuer"];
+        var audience = _config["Jwt:Audience"];
+        var key = _config["Jwt:Key"];
+        var expires = int.TryParse(_config["Jwt:ExpiresMinutes"], out var m) ? m : 60;
 
-    /// <summary>
-    /// Generates a JWT token for a specific user.
-    /// </summary>
-    /// <param name="user">User for whom the token will be generated.</param>
-    /// <returns>Valid JWT token as string.</returns>
-    /// <remarks>
-    /// The generated token includes the following claims:
-    /// - NameIdentifier (User ID)
-    /// - Name (Username)
-    /// - Role (User role)
-    /// 
-    /// The token is valid for 8 hours from the moment of generation.
-    /// </remarks>
-    /// <exception cref="ArgumentNullException">Thrown when user or secret key is not provided.</exception>
-    public string GenerateToken(IUser user)
-    {
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_configuration["Jwt:SecretKey"]);
-
-        var claims = new[]
+        var claims = new List<Claim>
         {
-           new Claim(ClaimTypes.NameIdentifier, user.Id),
-           new Claim(ClaimTypes.Name, user.Username),
-           new Claim(ClaimTypes.Role, user.Role)
-       };
-
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddHours(8),
-            SigningCredentials = new SigningCredentials(
-                new SymmetricSecurityKey(key),
-                SecurityAlgorithms.HmacSha256Signature)
+            new(JwtRegisteredClaimNames.Sub, userId.ToString()),
+            new(JwtRegisteredClaimNames.UniqueName, username),
+            new(ClaimTypes.Name, username),
         };
 
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        return tokenHandler.WriteToken(token);
+        if (roles != null)
+            claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));
+
+        var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key!));
+        var creds = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
+
+        var token = new JwtSecurityToken(
+            issuer: issuer,
+            audience: audience,
+            claims: claims,
+            expires: DateTime.UtcNow.AddMinutes(expires),
+            signingCredentials: creds);
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }

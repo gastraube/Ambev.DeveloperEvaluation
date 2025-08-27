@@ -7,6 +7,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Repositories;
 /// </summary>
 public interface IUserRepository
 {
+    Task<User?> GetByUsernameAsync(string username, CancellationToken ct);
     /// <summary>
     /// Creates a new user in the repository
     /// </summary>

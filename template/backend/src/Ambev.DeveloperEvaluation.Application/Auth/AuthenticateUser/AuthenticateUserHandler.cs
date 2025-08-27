@@ -38,7 +38,11 @@ namespace Ambev.DeveloperEvaluation.Application.Auth.AuthenticateUser
                 throw new UnauthorizedAccessException("User is not active");
             }
 
-            var token = _jwtTokenGenerator.GenerateToken(user);
+            var token = _jwtTokenGenerator.GenerateToken(
+                 user.Id,
+                 string.IsNullOrWhiteSpace(user.Username) ? user.Email : user.Username,
+                 new[] { user.Role.ToString() } 
+             );
 
             return new AuthenticateUserResult
             {
