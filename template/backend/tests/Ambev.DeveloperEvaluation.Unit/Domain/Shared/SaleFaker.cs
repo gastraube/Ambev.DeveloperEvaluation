@@ -22,7 +22,7 @@ namespace Ambev.DeveloperEvaluation.Unit.Domain.Shared
                         Branch = f.Address.City()
                     };
 
-                    var sid = sale.Id; // se BaseEntity setar Guid no ctor
+                    var sid = sale.Id;
 
                     sale.Items = Enumerable.Range(0, items)
                         .Select(_ => SaleItemFaker.Create(sid).Generate())
