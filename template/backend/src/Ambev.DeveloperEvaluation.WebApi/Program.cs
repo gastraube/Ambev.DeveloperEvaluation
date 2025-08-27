@@ -26,10 +26,8 @@ public class Program
 
             var builder = WebApplication.CreateBuilder(args);
 
-            // Serilog
             builder.AddDefaultLogging();
 
-            // Controllers e Swagger
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
@@ -57,11 +55,9 @@ public class Program
                     { jwtScheme, Array.Empty<string>() }
                 });
             });
-
-            // Healthchecks
+        
             builder.AddBasicHealthChecks();
 
-            // DbContext
             builder.Services.AddDbContext<DefaultContext>(options =>
                 options.UseNpgsql(
                     builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -69,13 +65,10 @@ public class Program
                 )
             );
 
-            // JWT
             builder.Services.AddJwtAuthentication(builder.Configuration);
 
-            // Injeção de dependência custom
             builder.RegisterDependencies();
 
-            // MediatR
             builder.Services.AddMediatR(cfg =>
             {
                 cfg.RegisterServicesFromAssemblies(
@@ -84,24 +77,20 @@ public class Program
                 );
             });
 
-            // AutoMapper
             builder.Services.AddAutoMapper(typeof(Program).Assembly, typeof(ApplicationLayer).Assembly);
 
-            // Validation pipeline
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
-            // Repositories
             builder.Services.AddScoped<ISaleRepository, SaleRepository>();
 
             var app = builder.Build();
 
-            // Roda migrations
             using (var scope = app.Services.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<DefaultContext>();
                 db.Database.Migrate();
             }
-            // Middlewares
+
             app.UseMiddleware<ValidationExceptionMiddleware>();
 
             if (app.Environment.IsDevelopment())
@@ -113,14 +102,11 @@ public class Program
 
             app.UseHttpsRedirection();
 
-            // Auth
             app.UseAuthentication();
             app.UseAuthorization();
 
-            // Healthchecks
             app.UseBasicHealthChecks();
 
-            // Controllers
             app.MapControllers();
 
             app.Run();

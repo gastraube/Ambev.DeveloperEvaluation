@@ -37,7 +37,6 @@ public class DefaultContext : DbContext
     {
         var result = await base.SaveChangesAsync(cancellationToken);
 
-        // Publica eventos de domínio pós-commit
         var entitiesWithEvents = ChangeTracker
             .Entries<BaseEntity>()
             .Where(e => e.Entity.DomainEvents != null && e.Entity.DomainEvents.Any())
