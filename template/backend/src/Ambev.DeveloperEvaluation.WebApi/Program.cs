@@ -95,6 +95,12 @@ public class Program
 
             var app = builder.Build();
 
+            // Roda migrations
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<DefaultContext>();
+                db.Database.Migrate();
+            }
             // Middlewares
             app.UseMiddleware<ValidationExceptionMiddleware>();
 

@@ -7,12 +7,9 @@ using System.Threading.Tasks;
 
 namespace Ambev.DeveloperEvaluation.Domain.Enums
 {
-    public enum SaleStatus
+    public enum SaleStatus : int
     {
-        [Description("Ativa")]
-        Active,
-
-        [Description("Cancelada")]
-        Cancelled
+        Active = 1,
+        Cancelled = 2
     }
 }
